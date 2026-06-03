@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="navbar">
+    <strong>Dashboard</strong>
+    <div>
+        <a href="/admin">Admin Panel</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="card success">
+        <h1>Welcome, {{ user.get("name") }}</h1>
+        <p>You authenticated successfully using Microsoft Entra ID.</p>
+    </div>
+
+    <div class="grid">
+        <div class="stat">
+            <span>Name</span>
+            <strong>{{ user.get("name") }}</strong>
+        </div>
+        <div class="stat">
+            <span>Email</span>
+            <strong>{{ user.get("preferred_username") }}</strong>
+        </div>
+        <div class="stat">
+            <span>Tenant ID</span>
+            <strong>{{ user.get("tid")[:8] }}...</strong>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Group Claims</h2>
+        {% for group in user.get("groups", []) %}
+            <span class="badge">{{ group }}</span>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h2>Raw Token Claims</h2>
+        <pre>{{ user }}</pre>
+    </div>
+
+</div>
+
+</body>
+</html>

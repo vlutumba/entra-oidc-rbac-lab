@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="navbar">
+    <strong>Admin Panel</strong>
+    <div>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="card success">
+        <h1>Access Granted</h1>
+        <p>You are authorized because your account belongs to the IAM-Admins group.</p>
+    </div>
+
+    <div class="card">
+        <h2>Admin Context</h2>
+        <p><strong>User:</strong> {{ user.get("name") }}</p>
+        <p><strong>Email:</strong> {{ user.get("preferred_username") }}</p>
+    </div>
+
+    <div class="card">
+        <h2>Token Claims</h2>
+        <pre>{{ user }}</pre>
+    </div>
+
+</div>
+
+</body>
+</html>

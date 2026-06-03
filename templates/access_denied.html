@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Access Denied</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="navbar">
+    <strong>Access Denied</strong>
+    <div>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="card denied">
+        <h1>Access Denied</h1>
+        <p>You are authenticated, but you are not authorized to access the Admin Panel.</p>
+        <p>This page requires membership in the IAM-Admins group.</p>
+    </div>
+
+    <div class="card">
+        <h2>Your Current Claims</h2>
+        <pre>{{ user }}</pre>
+    </div>
+
+</div>
+
+</body>
+</html>

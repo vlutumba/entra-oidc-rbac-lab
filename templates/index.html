@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Entra ID OIDC RBAC Lab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="navbar">
+    <strong>Entra ID OIDC RBAC Lab</strong>
+    <div>
+        <a href="/login">Login</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card hero">
+        <h1>Microsoft Entra ID Authentication Lab</h1>
+        <p>
+            A hands-on IAM portfolio project demonstrating OIDC authentication,
+            JWT claims, group-based authorization, and RBAC.
+        </p>
+        <a class="btn" href="/login">Login with Microsoft</a>
+    </div>
+
+    <div class="grid">
+        <div class="stat">
+            <span>Protocol</span>
+            <strong>OpenID Connect</strong>
+        </div>
+        <div class="stat">
+            <span>Identity Provider</span>
+            <strong>Microsoft Entra ID</strong>
+        </div>
+        <div class="stat">
+            <span>Security Model</span>
+            <strong>RBAC</strong>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
