@@ -24,6 +24,22 @@ GROUP_MAP = {
     IAM_ANALYSTS_GROUP_ID: "IAM-Analysts",
 }
 
+from datetime import datetime
+
+AUDIT_LOGS = []
+
+
+def write_audit_log(action, status="Success"):
+    user = session.get("user", {})
+
+    AUDIT_LOGS.append({
+        "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "user": user.get("name", "Unknown User"),
+        "email": user.get("preferred_username", "Unknown Email"),
+        "action": action,
+        "status": status
+    })
+
 AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 SCOPE = ["User.Read"]
 
@@ -93,6 +109,7 @@ def authorized():
 
     claims = result.get("id_token_claims", {})
     session["user"] = claims
+    write_audit_log("User logged in")
 
     return redirect(url_for("dashboard"))
 
@@ -102,9 +119,18 @@ def authorized():
 def dashboard():
     user = enrich_user_with_group_names(session["user"])
     session["user"] = user
+    write_audit_log("Dashboard accessed")
 
     return render_template("dashboard.html", user=user)
 
+@app.route("/profile")
+@login_required
+def profile():
+    user = enrich_user_with_group_names(session["user"])
+    session["user"] = user
+    write_audit_log("Profile page accessed")
+
+    return render_template("profile.html", user=user)
 
 @app.route("/admin")
 @login_required
@@ -113,19 +139,33 @@ def admin():
     groups = user.get("groups", [])
 
     if IAM_ADMINS_GROUP_ID not in groups:
+        write_audit_log("Admin page access attempted", "Denied")
         return render_template("access_denied.html", user=user), 403
 
+    write_audit_log("Admin page accessed")
     return render_template("admin.html", user=user)
 
 
 @app.route("/logout")
 def logout():
+    write_audit_log("User logged out")
     session.clear()
     return redirect(
         f"{AUTHORITY}/oauth2/v2.0/logout"
         f"?post_logout_redirect_uri=http://localhost:5000/"
     )
 
+@app.route("/audit")
+@login_required
+def audit():
+    user = enrich_user_with_group_names(session["user"])
+
+    if IAM_ADMINS_GROUP_ID not in user.get("groups", []):
+        write_audit_log("Audit log access attempted", "Denied")
+        return render_template("access_denied.html", user=user), 403
+
+    write_audit_log("Audit log viewed")
+    return render_template("audit.html", logs=AUDIT_LOGS, user=user)
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
