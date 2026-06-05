@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="navbar">
+    <strong>User Profile</strong>
+    <div>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/admin">Admin Panel</a>
+        <a href="/audit">Audit Logs</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="card success">
+        <h1>{{ user.get("name") }}</h1>
+        <p>Authenticated through Microsoft Entra ID using OpenID Connect.</p>
+    </div>
+
+    <div class="grid">
+        <div class="stat">
+            <span>First Name</span>
+            <strong>{{ user.get("given_name") }}</strong>
+        </div>
+        <div class="stat">
+            <span>Last Name</span>
+            <strong>{{ user.get("family_name") }}</strong>
+        </div>
+        <div class="stat">
+            <span>Email</span>
+            <strong>{{ user.get("preferred_username") }}</strong>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Identity Details</h2>
+        <p><strong>Object ID:</strong> {{ user.get("oid") }}</p>
+        <p><strong>Tenant ID:</strong> {{ user.get("tid") }}</p>
+        <p><strong>Authentication Version:</strong> {{ user.get("ver") }}</p>
+        <p><strong>Identity Provider:</strong> {{ user.get("idp") }}</p>
+    </div>
+
+    <div class="card">
+        <h2>Group Memberships</h2>
+        {% for group in user.get("group_names", []) %}
+            <span class="badge">{{ group }}</span>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h2>Authorization Summary</h2>
+
+        {% if "IAM-Admins" in user.get("group_names", []) %}
+            <p>✅ User has administrative access through IAM-Admins.</p>
+        {% else %}
+            <p>❌ User does not have administrative access.</p>
+        {% endif %}
+
+        {% if "IAM-Analysts" in user.get("group_names", []) %}
+            <p>✅ User has analyst access through IAM-Analysts.</p>
+        {% else %}
+            <p>❌ User does not have analyst access.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+</body>
+</html>
