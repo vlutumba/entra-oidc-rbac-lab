@@ -16,6 +16,14 @@ CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 TENANT_ID = os.getenv("TENANT_ID")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
 
+IAM_ADMINS_GROUP_ID = os.getenv("IAM_ADMINS_GROUP_ID")
+IAM_ANALYSTS_GROUP_ID = os.getenv("IAM_ANALYSTS_GROUP_ID")
+
+GROUP_MAP = {
+    IAM_ADMINS_GROUP_ID: "IAM-Admins",
+    IAM_ANALYSTS_GROUP_ID: "IAM-Analysts",
+}
+
 AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 SCOPE = ["User.Read"]
 
@@ -26,6 +34,17 @@ def build_msal_app():
         authority=AUTHORITY,
         client_credential=CLIENT_SECRET,
     )
+
+
+def enrich_user_with_group_names(user):
+    groups = user.get("groups", [])
+
+    user["group_names"] = [
+        GROUP_MAP.get(group, group)
+        for group in groups
+    ]
+
+    return user
 
 
 def login_required(f):
@@ -81,20 +100,19 @@ def authorized():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("dashboard.html", user=session["user"])
+    user = enrich_user_with_group_names(session["user"])
+    session["user"] = user
+
+    return render_template("dashboard.html", user=user)
 
 
 @app.route("/admin")
 @login_required
 def admin():
-    user = session["user"]
+    user = enrich_user_with_group_names(session["user"])
     groups = user.get("groups", [])
 
-    # For now this displays group IDs from Entra.
-    # We will map IAM-Admins group ID after testing the token.
-    admin_group_id = os.getenv("IAM_ADMINS_GROUP_ID", "")
-
-    if admin_group_id not in groups:
+    if IAM_ADMINS_GROUP_ID not in groups:
         return render_template("access_denied.html", user=user), 403
 
     return render_template("admin.html", user=user)
